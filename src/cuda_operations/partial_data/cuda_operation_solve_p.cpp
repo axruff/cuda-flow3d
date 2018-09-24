@@ -146,15 +146,19 @@ void CudaOperationSolveP::Execute(OperationParameters& params)
   CheckCudaError(cuEventRecord(cu_event_start, NULL));
 
   /* Display computation status */
-  Utils::PrintProgressBar(0.f);
-  std::printf(" % 3.0f%%", 0.f);
+  if (!silent) {
+      Utils::PrintProgressBar(0.f);
+      std::printf(" % 3.0f%%", 0.f);
+  }
   
   /* Initialize flow increment buffers with 0 */
   flow_du.ZeroData();
   flow_dv.ZeroData();
   flow_dw.ZeroData();
 
-  std::printf("\n");
+
+  if (!silent)
+    std::printf("\n");
 
   for (size_t i = 0; i < outer_iterations_count; ++i) {
     ComputePhiKsi(frame_0, frame_1, flow_u, flow_v, flow_w, flow_du, flow_dv, flow_dw, data_size, hx, hy, hz, equation_smoothness, equation_data, phi, ksi);
@@ -176,9 +180,11 @@ void CudaOperationSolveP::Execute(OperationParameters& params)
       //flow_dw.WriteRAWToFileF32(std::string("./data/output/debug/p/flow_dw_slv-180-180-151-" + std::to_string(data_size.width) + std::string(".raw")).c_str());
 
       /* Display computation status */
-      float complete = (i * inner_iterations_count + j) / static_cast<float>(total_iterations_count);
-      Utils::PrintProgressBar(complete);
-      std::printf(" % 3.0f%%", complete * 100);
+      if (!silent) {
+          float complete = (i * inner_iterations_count + j) / static_cast<float>(total_iterations_count);
+          Utils::PrintProgressBar(complete);
+          std::printf(" % 3.0f%%", complete * 100);
+      }
     }
   }
   /* Estimate GPU computation time */
@@ -188,8 +194,10 @@ void CudaOperationSolveP::Execute(OperationParameters& params)
   float elapsed_time;
   CheckCudaError(cuEventElapsedTime(&elapsed_time, cu_event_start, cu_event_stop));
   
-  Utils::PrintProgressBar(1.f);
-  std::printf(" %8.4fs\n", elapsed_time / 1000.);
+  if (!silent) {
+      Utils::PrintProgressBar(1.f);
+      std::printf(" %8.4fs\n", elapsed_time / 1000.);
+  }
 }
 
 void CudaOperationSolveP::ComputePhiKsi(

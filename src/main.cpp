@@ -71,6 +71,13 @@ int main(int argc, char** argv)
   Data3D frame_1;
   DataSize4 data_size = {width, height, depth, 0};
 
+  std::printf("//----------------------------------------------------------------------//\n");
+  std::printf("//            3D Optical flow using NVIDIA CUDA. Version 0.6.0	        //\n");
+  std::printf("//                                                                      //\n");
+  std::printf("//            Karlsruhe Institute of Technology. 2015 - 2018            //\n");
+  std::printf("//----------------------------------------------------------------------//\n");
+
+
   /* Initialize CUDA */
   if (!InitCudaContextWithFirstAvailableDevice(&cu_context)) {
     return 1;
@@ -113,6 +120,8 @@ int main(int argc, char** argv)
     params.PushValuePtr("median_radius",          &median_radius);
     params.PushValuePtr("gaussian_sigma",         &gaussian_sigma);
 
+    std::printf("Mode: Full GPU mode \n");
+
     optical_flow_e.silent = silent_mode;
 
     optical_flow_e.ComputeFlow(frame_0, frame_1, flow_u, flow_v, flow_w, params);
@@ -145,6 +154,8 @@ int main(int argc, char** argv)
     params.PushValuePtr("equation_data",          &equation_data);
     params.PushValuePtr("median_radius",          &median_radius);
     params.PushValuePtr("gaussian_sigma",         &gaussian_sigma);
+
+    std::printf("Mode: Partial processing mode \n");
 
     optical_flow_p.silent = silent_mode;
 

@@ -53,6 +53,8 @@ public:
 
   bool Initialize(const OperationParameters* params = nullptr) override;
   void Execute(OperationParameters& params) override;
+
+  bool silent = false;
 };
 
 

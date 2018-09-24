@@ -145,7 +145,8 @@ void OpticalFlowP::ComputeFlow(Data3D& frame_0, Data3D& frame_1, Data3D& flow_u,
     hy = original_data_size.height / static_cast<float>(current_data_size.height);
     hz = original_data_size.depth / static_cast<float>(current_data_size.depth);
 
-    std::printf("Solve level %2d (%4d x%4d x%4d) \n", current_warp_level, current_data_size.width, current_data_size.height, current_data_size.depth);
+    if (!silent)
+        std::printf("Solve level %2d (%4d x%4d x%4d) \n", current_warp_level, current_data_size.width, current_data_size.height, current_data_size.depth);
 
     /* Data resampling */
     {
@@ -247,6 +248,7 @@ void OpticalFlowP::ComputeFlow(Data3D& frame_0, Data3D& frame_1, Data3D& flow_u,
       op.PushValuePtr("hy",                     &hy);
       op.PushValuePtr("hz",                     &hz);
 
+      cuop_solve_p_.silent = silent;
       cuop_solve_p_.Execute(op);
     }
 
