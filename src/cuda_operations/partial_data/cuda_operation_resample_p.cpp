@@ -36,12 +36,12 @@ bool CudaOperationResampleP::Initialize(const OperationParameters* params)
 
   char exec_path[256];
   Utils::GetExecutablePath(exec_path, 256);
-  std::strcat(exec_path, "/kernels/resample_p.ptx");
+  std::strcat(exec_path, "/kernels/resample_p_3d.ptx");
 
   if (!CheckCudaError(cuModuleLoad(&cu_module_, exec_path))) {
-    if (!CheckCudaError(cuModuleGetFunction(&cuf_resample_x_, cu_module_, "resample_x_p")) &&
-        !CheckCudaError(cuModuleGetFunction(&cuf_resample_y_, cu_module_, "resample_y_p")) &&
-        !CheckCudaError(cuModuleGetFunction(&cuf_resample_z_, cu_module_, "resample_z_p"))
+    if (!CheckCudaError(cuModuleGetFunction(&cuf_resample_x_, cu_module_, "resample_x_p_3d")) &&
+        !CheckCudaError(cuModuleGetFunction(&cuf_resample_y_, cu_module_, "resample_y_p_3d")) &&
+        !CheckCudaError(cuModuleGetFunction(&cuf_resample_z_, cu_module_, "resample_z_p_3d"))
         ) {
       initialized_ = true;
     } else {

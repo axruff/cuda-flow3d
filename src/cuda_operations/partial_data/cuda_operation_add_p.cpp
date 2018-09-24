@@ -34,10 +34,10 @@ bool CudaOperationAddP::Initialize(const OperationParameters* params)
 
   char exec_path[256];
   Utils::GetExecutablePath(exec_path, 256);
-  std::strcat(exec_path, "/kernels/add.ptx");
+  std::strcat(exec_path, "/kernels/add_3d.ptx");
 
   if (!CheckCudaError(cuModuleLoad(&cu_module_, exec_path))) {
-    if (!CheckCudaError(cuModuleGetFunction(&cuf_add_, cu_module_, "add"))) {
+    if (!CheckCudaError(cuModuleGetFunction(&cuf_add_, cu_module_, "add_3d"))) {
       initialized_ = true;
     } else {
       CheckCudaError(cuModuleUnload(cu_module_));

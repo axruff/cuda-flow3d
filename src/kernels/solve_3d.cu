@@ -30,7 +30,7 @@ __constant__ DataSize4 container_size;
 
 extern __shared__ float shared[];
 
-extern "C" __global__ void compute_phi_ksi(
+extern "C" __global__ void compute_phi_ksi_3d(
   const float* frame_0,
   const float* frame_1,
   const float* flow_u,
@@ -261,7 +261,7 @@ extern "C" __global__ void compute_phi_ksi(
   }
 }
 
-extern "C" __global__ void solve(
+extern "C" __global__ void solve_3d(
   const float* frame_0,
   const float* frame_1,
   const float* flow_u,

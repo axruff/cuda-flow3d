@@ -23,7 +23,7 @@
 
 __constant__ DataSize4 container_size;
 
-extern "C" __global__ void add(
+extern "C" __global__ void add_3d(
         float* operand_0,
   const float* operand_1,
         size_t width,

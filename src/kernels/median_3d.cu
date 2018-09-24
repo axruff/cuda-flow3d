@@ -45,7 +45,7 @@ __device__ void sort(float* buffer, size_t length)
 }
 
 /* See a note about the thread block size in cuda_operation_median.cpp file.*/
-extern "C" __global__ void median(
+extern "C" __global__ void median_3d(
   const float* input,
         size_t width,
         size_t height,

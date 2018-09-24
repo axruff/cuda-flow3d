@@ -44,10 +44,10 @@ bool CudaOperationMedian::Initialize(const OperationParameters* params)
  
   char exec_path[256];
   Utils::GetExecutablePath(exec_path, 256);
-  std::strcat(exec_path, "/kernels/median.ptx");
+  std::strcat(exec_path, "/kernels/median_3d.ptx");
 
   if (!CheckCudaError(cuModuleLoad(&cu_module_, exec_path))) {
-    if (!CheckCudaError(cuModuleGetFunction(&cuf_median_, cu_module_, "median"))) {
+    if (!CheckCudaError(cuModuleGetFunction(&cuf_median_, cu_module_, "median_3d"))) {
       size_t const_size;
 
       /* Get the pointer to the constant memory and copy data */

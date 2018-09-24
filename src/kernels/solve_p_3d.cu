@@ -40,7 +40,7 @@ texture<float, cudaTextureType3D, cudaReadModeElementType> t_phi;
 texture<float, cudaTextureType3D, cudaReadModeElementType> t_ksi;
 
 
-extern "C" __global__ void compute_phi_ksi_p(
+extern "C" __global__ void compute_phi_ksi_p_3d(
   size_t width,
   size_t height,
   size_t depth,
@@ -157,7 +157,7 @@ extern "C" __global__ void compute_phi_ksi_p(
   }
 }
 
-extern "C" __global__ void solve_p(
+extern "C" __global__ void solve_p_3d(
         size_t width,
         size_t height,
         size_t depth,

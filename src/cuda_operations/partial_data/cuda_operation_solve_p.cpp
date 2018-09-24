@@ -33,11 +33,11 @@ bool CudaOperationSolveP::Initialize(const OperationParameters* params)
 
   char exec_path[256];
   Utils::GetExecutablePath(exec_path, 256);
-  std::strcat(exec_path, "/kernels/solve_p.ptx");
+  std::strcat(exec_path, "/kernels/solve_p_3d.ptx");
 
   if (!CheckCudaError(cuModuleLoad(&cu_module_, exec_path))) {
-    if (!CheckCudaError(cuModuleGetFunction(&cuf_compute_phi_ksi_p_, cu_module_, "compute_phi_ksi_p")) &&
-        !CheckCudaError(cuModuleGetFunction(&cuf_solve_p_, cu_module_, "solve_p"))
+    if (!CheckCudaError(cuModuleGetFunction(&cuf_compute_phi_ksi_p_, cu_module_, "compute_phi_ksi_p_3d")) &&
+        !CheckCudaError(cuModuleGetFunction(&cuf_solve_p_, cu_module_, "solve_p_3d"))
         ) {
       initialized_ = true;
     } else {

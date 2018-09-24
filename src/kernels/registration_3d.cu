@@ -25,7 +25,7 @@
 
 __constant__ DataSize4 container_size;
 
-extern "C" __global__ void registration(
+extern "C" __global__ void registration_3d(
   const float* frame_0,
   const float* frame_1,
   const float* flow_u,

@@ -34,7 +34,7 @@ texture<float, cudaTextureType3D, cudaReadModeElementType> t_flow_v;
 texture<float, cudaTextureType3D, cudaReadModeElementType> t_flow_w;
 
 
-extern "C" __global__ void registration_p(
+extern "C" __global__ void registration_p_3d(
         size_t width,
         size_t height,
         size_t depth,

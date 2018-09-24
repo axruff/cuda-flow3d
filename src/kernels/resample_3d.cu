@@ -21,13 +21,11 @@
 
 #include "src/data_types/data_structs.h"
 
-#define IIND(X, Y, Z) (((Z) * input_size.height + (Y)) * (input_size.pitch / sizeof(float)) + (X)) 
-#define OIND(X, Y, Z) (((Z) * output_size.height + (Y)) * (output_size.pitch / sizeof(float)) + (X)) 
+#define IND(X, Y, Z) (((Z) * container_size.height + (Y)) * (container_size.pitch / sizeof(float)) + (X)) 
 
-__constant__ DataSize4 input_size;
-__constant__ DataSize4 output_size;
+__constant__ DataSize4 container_size;
 
-extern "C" __global__ void resample_x_p(
+extern "C" __global__ void resample_x_3d(
   const float* input,
         float* output,
         size_t out_width,
@@ -66,13 +64,13 @@ extern "C" __global__ void resample_x_p(
       if ((right_i - left_i) == 1) {
         frac = delta;
       }
-      value += input[IIND(left_i + j, globalID.y, globalID.z)] * frac;
+      value += input[IND(left_i + j, globalID.y, globalID.z)] * frac;
     }
-    output[OIND(globalID.x, globalID.y, globalID.z)] = value * normalization;
+    output[IND(globalID.x, globalID.y, globalID.z)] = value * normalization;
   }
 }
 
-extern "C" __global__ void resample_y_p(
+extern "C" __global__ void resample_y_3d(
   const float* input,
         float* output,
         size_t out_width,
@@ -111,13 +109,13 @@ extern "C" __global__ void resample_y_p(
       if ((right_i - left_i) == 1) {
         frac = delta;
       }
-      value += input[IIND(globalID.x, left_i + j, globalID.z)] * frac;
+      value += input[IND(globalID.x, left_i + j, globalID.z)] * frac;
     }
-    output[OIND(globalID.x, globalID.y, globalID.z)] = value * normalization;
+    output[IND(globalID.x, globalID.y, globalID.z)] = value * normalization;
   }
 }
 
-extern "C" __global__ void resample_z_p(
+extern "C" __global__ void resample_z_3d(
   const float* input,
         float* output,
         size_t out_width,
@@ -156,8 +154,31 @@ extern "C" __global__ void resample_z_p(
       if ((right_i - left_i) == 1) {
         frac = delta;
       }
-      value += input[IIND(globalID.x, globalID.y, left_i + j)] * frac;
+      value += input[IND(globalID.x, globalID.y, left_i + j)] * frac;
     }
-    output[OIND(globalID.x, globalID.y, globalID.z)] = value * normalization;
+    output[IND(globalID.x, globalID.y, globalID.z)] = value * normalization;
+  }
+}
+
+extern "C" __global__ void resample_x_debug(
+  const float* input,
+  float* output,
+  size_t width,
+  size_t height,
+  size_t depth,
+  size_t resample_width)
+{
+  dim3 globalID(blockDim.x * blockIdx.x + threadIdx.x,
+    blockDim.y * blockIdx.y + threadIdx.y,
+    blockDim.z * blockIdx.z + threadIdx.z);
+
+  if (globalID.y < height && globalID.z < depth) {
+    for (size_t x = 0; x < width; x += 4) {
+      *((float4*)(&(output[IND(x, globalID.y, globalID.z)]))) =
+        *((const float4*)(&(input[IND(x, globalID.y, globalID.z)])));
+    }
+    for (size_t x = 0; x < width; x++) {
+      output[IND(x, globalID.y, globalID.z)] = input[IND(x, globalID.y, globalID.z)];
+    }
   }
 }

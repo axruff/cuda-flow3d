@@ -36,10 +36,10 @@ bool CudaOperationRegistrationP::Initialize(const OperationParameters* params)
  
   char exec_path[256];
   Utils::GetExecutablePath(exec_path, 256);
-  std::strcat(exec_path, "/kernels/registration_p.ptx");
+  std::strcat(exec_path, "/kernels/registration_p_3d.ptx");
 
   if (!CheckCudaError(cuModuleLoad(&cu_module_, exec_path))) {
-    if (!CheckCudaError(cuModuleGetFunction(&cuf_registration_p_, cu_module_, "registration_p"))) {
+    if (!CheckCudaError(cuModuleGetFunction(&cuf_registration_p_, cu_module_, "registration_p_3d"))) {
             initialized_ = true;
     } else {
       CheckCudaError(cuModuleUnload(cu_module_));

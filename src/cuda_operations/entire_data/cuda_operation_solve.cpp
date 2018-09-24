@@ -46,11 +46,11 @@ bool CudaOperationSolve::Initialize(const OperationParameters* params)
 
   char exec_path[256];
   Utils::GetExecutablePath(exec_path, 256);
-  std::strcat(exec_path, "/kernels/solve.ptx");
+  std::strcat(exec_path, "/kernels/solve_3d.ptx");
 
   if (!CheckCudaError(cuModuleLoad(&cu_module_, exec_path))) {
-    if (!CheckCudaError(cuModuleGetFunction(&cuf_compute_phi_ksi_, cu_module_, "compute_phi_ksi")) &&
-        !CheckCudaError(cuModuleGetFunction(&cuf_solve_, cu_module_, "solve"))
+    if (!CheckCudaError(cuModuleGetFunction(&cuf_compute_phi_ksi_, cu_module_, "compute_phi_ksi_3d")) &&
+        !CheckCudaError(cuModuleGetFunction(&cuf_solve_, cu_module_, "solve_3d"))
         ) {
       size_t const_size;
 
