@@ -50,6 +50,8 @@ public:
   void ComputeFlow(Data3D& frame_0, Data3D& frame_1, Data3D& flow_u, Data3D& flow_v, Data3D&flow_w, OperationParameters& params) override;
   void Destroy() override;
 
+  bool silent = false;
+
   ~OpticalFlowP() override;
 };
 #endif // !GPUFLOW3D_OPTICAL_FLOW_OPTICAL_FLOW_P_H_

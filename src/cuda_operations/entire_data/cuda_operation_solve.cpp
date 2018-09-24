@@ -170,11 +170,14 @@ void CudaOperationSolve::Execute(OperationParameters& params)
   CheckCudaError(cuEventCreate(&cu_event_start, CU_EVENT_DEFAULT));
   CheckCudaError(cuEventCreate(&cu_event_stop, CU_EVENT_DEFAULT));
 
+ 
   CheckCudaError(cuEventRecord(cu_event_start, NULL));
 
-  /* Display computation status */
-  Utils::PrintProgressBar(0.f);
-  std::printf(" % 3.0f%%", 0.f);
+  if (!silent) {
+      /* Display computation status */
+      Utils::PrintProgressBar(0.f);
+      std::printf(" % 3.0f%%", 0.f);
+  }
 
   /* Initialize flow increment buffers with 0 */
   CheckCudaError(cuMemsetD2D8(dev_flow_du, dev_container_size_.pitch, 0, data_size.width * sizeof(float),
@@ -254,9 +257,11 @@ void CudaOperationSolve::Execute(OperationParameters& params)
       CheckCudaError(cuStreamSynchronize(NULL));
 
       /* Display computation status */
-      float complete = (i * inner_iterations_count + j) / static_cast<float>(total_iterations_count);
-      Utils::PrintProgressBar(complete);
-      std::printf(" % 3.0f%%", complete * 100);
+      if (!silent) {
+          float complete = (i * inner_iterations_count + j) / static_cast<float>(total_iterations_count);
+          Utils::PrintProgressBar(complete);
+          std::printf(" % 3.0f%%", complete * 100);
+      }
     }
   }
   /* Estimate GPU computation time */
@@ -266,8 +271,10 @@ void CudaOperationSolve::Execute(OperationParameters& params)
   float elapsed_time;
   CheckCudaError(cuEventElapsedTime(&elapsed_time, cu_event_start, cu_event_stop));
   
-  Utils::PrintProgressBar(1.f);
-  std::printf(" %8.4fs\n", elapsed_time / 1000.);
+  if (!silent) {
+      Utils::PrintProgressBar(1.f);
+      std::printf(" %8.4fs\n", elapsed_time / 1000.);
+  }
 
   CheckCudaError(cuEventDestroy(cu_event_start));
   CheckCudaError(cuEventDestroy(cu_event_stop));

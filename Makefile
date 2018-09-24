@@ -2,7 +2,7 @@ BASEDIR :=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 INC-DIR := "-I$(BASEDIR)"
 
 CC := g++
-CFLAGS := -c -std=c++11 -O3 -funroll-all-loops  -Wno-deprecated
+CFLAGS := -c -std=c++11 -O3 -funroll-all-loops  -Wno-deprecated -D NO_VISUALIZATION
 TARGET := cuda-flow3d
 
 CUDA-TOP     = /usr/local/cuda-7.0

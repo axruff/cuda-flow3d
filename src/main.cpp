@@ -28,13 +28,17 @@
 #include "src/data_types/data_structs.h"
 #include "src/data_types/operation_parameters.h"
 #include "src/utils/cuda_utils.h"
-#include "src/visualization.h"
+
+#ifndef NO_VISUALIZATION
+    #include "src/visualization.h"
+#endif
 
 
 int main(int argc, char** argv)
 {
-  const bool key_press = true;
-  const bool use_visualization = true;
+  const bool key_press = false;
+  const bool use_visualization = false;
+  const bool silent_mode = true;
 
   const bool use_entire_gpu = true;
   const bool use_partial_gpu = false;
@@ -82,12 +86,14 @@ int main(int argc, char** argv)
   //    return 2;
   //}
 
+#ifndef NO_VISUALIZATION
   Visualization& visualization = Visualization::GetInstance();
 
   if (use_visualization) {
     visualization.RunInSeparateThread();
     visualization.WaitForInitialization();
   }
+#endif
 
   /* OpticalFlow that stores all data on the one gpu */
   if (use_entire_gpu && optical_flow_e.Initialize(data_size)) {
@@ -106,6 +112,8 @@ int main(int argc, char** argv)
     params.PushValuePtr("equation_data",          &equation_data);
     params.PushValuePtr("median_radius",          &median_radius);
     params.PushValuePtr("gaussian_sigma",         &gaussian_sigma);
+
+    optical_flow_e.silent = silent_mode;
 
     optical_flow_e.ComputeFlow(frame_0, frame_1, flow_u, flow_v, flow_w, params);
     
@@ -138,6 +146,8 @@ int main(int argc, char** argv)
     params.PushValuePtr("median_radius",          &median_radius);
     params.PushValuePtr("gaussian_sigma",         &gaussian_sigma);
 
+    optical_flow_p.silent = silent_mode;
+
     optical_flow_p.ComputeFlow(frame_0, frame_1, flow_u, flow_v, flow_w, params);
     
     std::string filename =
@@ -151,10 +161,11 @@ int main(int argc, char** argv)
 
     optical_flow_p.Destroy();
   }
-
+#ifndef NO_VISUALIZATION
   if (use_visualization) {
     visualization.WaitForFinalization();
   }
+#endif
 
   if (key_press) {
     std::printf("Press enter to continue...");

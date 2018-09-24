@@ -34,6 +34,8 @@ public:
 
   bool Initialize(const OperationParameters* params = nullptr) override;
   void Execute(OperationParameters& params) override;
+
+  bool silent = false;
 };
 
 #endif // !GPUFLOW3D_CUDA_OPERATIONS_ENTIRE_DATA_CUDA_OPERATION_SOLVE_H_
