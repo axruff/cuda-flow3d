@@ -16,6 +16,8 @@
 
 #include "src/cuda_operations/entire_data/cuda_operation_median.h"
 
+#include <cstring>
+
 #include <cuda.h>
 #include <vector_types.h>
 

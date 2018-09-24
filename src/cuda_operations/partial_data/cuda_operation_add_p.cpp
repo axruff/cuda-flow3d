@@ -17,6 +17,7 @@
 #include "src/cuda_operations/partial_data/cuda_operation_add_p.h"
 
 #include <algorithm>
+#include <cstring>
 
 #include "src/data_types/data3d.h"
 #include "src/data_types/data_structs.h"

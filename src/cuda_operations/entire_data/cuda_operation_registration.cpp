@@ -16,6 +16,8 @@
 
 #include "src/cuda_operations/entire_data/cuda_operation_registration.h"
 
+#include <cstring>
+
 #include <cuda.h>
 #include <vector_types.h>
 

@@ -14,6 +14,8 @@
 *
 */
 
+#include <cmath>
+
 #include "src/optical_flow/optical_flow_base.h"
 
 OpticalFlowBase::OpticalFlowBase(const char* name)

@@ -16,6 +16,8 @@
 
 #include "src/cuda_operations/partial_data/cuda_operation_solve_p.h"
 
+#include <cstring>
+
 #include <algorithm>
 #include <vector_types.h>
 

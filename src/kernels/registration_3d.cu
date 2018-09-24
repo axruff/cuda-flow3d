@@ -59,9 +59,9 @@ extern "C" __global__ void registration_3d(
       float delta_y = y_f - (float) y;
       float delta_z = z_f - (float) z;
 
-      int x_1 = min(width -1, size_t(x + 1));
-      int y_1 = min(height - 1, size_t(y + 1));
-      int z_1 = min(depth - 1, size_t(z + 1));
+      int x_1 = fminf(width -1, size_t(x + 1));
+      int y_1 = fminf(height - 1, size_t(y + 1));
+      int z_1 = fminf(depth - 1, size_t(z + 1));
 
       float value_0 =
         (1.f - delta_x) * (1.f - delta_y) * frame_1[IND(x  , y  , z  )] +

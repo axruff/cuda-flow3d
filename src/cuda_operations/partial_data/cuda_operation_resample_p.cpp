@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 
 #include <vector_types.h>
 

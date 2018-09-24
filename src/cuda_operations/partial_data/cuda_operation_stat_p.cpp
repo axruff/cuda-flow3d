@@ -16,6 +16,7 @@
 
 #include "src/cuda_operations/partial_data/cuda_operation_stat_p.h"
 
+#include <cstring>
 #include <algorithm>
 
 #include "src/data_types/data3d.h"

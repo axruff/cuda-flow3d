@@ -47,7 +47,7 @@ extern "C" __global__ void resample_x_p_3d(
     float right_f = (globalID.x + 1) * delta;
 
     int left_i = static_cast<int>(floor(left_f));
-    int right_i = min(in_width, static_cast<size_t>(ceil(right_f)));
+    int right_i = fminf(in_width, static_cast<size_t>(ceil(right_f)));
 
     float value = 0.f;
     
@@ -92,7 +92,7 @@ extern "C" __global__ void resample_y_p_3d(
     float right_f = (globalID.y + 1) * delta;
 
     int left_i = static_cast<int>(floor(left_f));
-    int right_i = min(in_height, static_cast<size_t>(ceil(right_f)));
+    int right_i = fminf(in_height, static_cast<size_t>(ceil(right_f)));
 
     float value = 0.f;
     
@@ -137,7 +137,7 @@ extern "C" __global__ void resample_z_p_3d(
     float right_f = (globalID.z + 1) * delta;
 
     int left_i = static_cast<int>(floor(left_f));
-    int right_i = min(in_depth, static_cast<size_t>(ceil(right_f)));
+    int right_i = fminf(in_depth, static_cast<size_t>(ceil(right_f)));
 
     float value = 0.f;
     

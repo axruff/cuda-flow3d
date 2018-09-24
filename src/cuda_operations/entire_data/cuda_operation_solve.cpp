@@ -17,6 +17,7 @@
 #include "src/cuda_operations/entire_data/cuda_operation_solve.h"
 
 #include <cstdio>
+#include <cstring>
 
 #include <vector_types.h>
 

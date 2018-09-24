@@ -17,6 +17,7 @@
 #include "src/cuda_operations/partial_data/cuda_operation_register_p.h"
 
 #include <algorithm>
+#include <cstring>
 
 #include <vector_types.h>
 
