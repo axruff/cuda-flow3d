@@ -31,6 +31,7 @@ OpticalFlowE::OpticalFlowE()
   : OpticalFlowBase("Optical Flow Single GPU")
 {
   cuda_operations_.push_front(&cuop_add_);
+  cuda_operations_.push_front(&cuop_convolution_);
   cuda_operations_.push_front(&cuop_median_);
   cuda_operations_.push_front(&cuop_register_);
   cuda_operations_.push_front(&cuop_resample_);
@@ -205,6 +206,56 @@ void OpticalFlowE::ComputeFlow(Data3D& frame_0, Data3D& frame_1, Data3D& flow_u,
 
   CopyData3DtoDevice(frame_0, dev_frame_0, dev_container_size_.height, dev_container_size_.pitch);
   CopyData3DtoDevice(frame_1, dev_frame_1, dev_container_size_.height, dev_container_size_.pitch);
+
+
+  /* Gaussian blurring */
+  if (gaussian_sigma > 0.0) {
+
+      CUdeviceptr dev_temp = cuda_memory_ptrs_.top();
+      cuda_memory_ptrs_.pop();
+
+      op.Clear();
+      op.PushValuePtr("dev_input", &dev_frame_0);
+      op.PushValuePtr("dev_output", &dev_flow_u);
+      op.PushValuePtr("dev_temp", &dev_temp);
+      op.PushValuePtr("data_size", &original_data_size);
+      op.PushValuePtr("gaussian_sigma", &gaussian_sigma);
+      cuop_convolution_.Execute(op);
+
+      //CheckCudaError(cuStreamSynchronize(NULL));
+      //std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+
+      op.Clear();
+      op.PushValuePtr("dev_input", &dev_frame_1);
+      op.PushValuePtr("dev_output", &dev_flow_v);
+      op.PushValuePtr("dev_temp", &dev_temp);
+      op.PushValuePtr("data_size", &original_data_size);
+      op.PushValuePtr("gaussian_sigma", &gaussian_sigma);
+      cuop_convolution_.Execute(op);
+
+      std::swap(dev_frame_0, dev_flow_u);
+      std::swap(dev_frame_1, dev_flow_v);
+
+      cuda_memory_ptrs_.push(dev_temp);
+
+
+      // Test: Save smoothed image
+      CopyData3DFromDevice(dev_frame_0, frame_0, dev_container_size_.height, dev_container_size_.pitch);
+      CopyData3DFromDevice(dev_frame_1, frame_1, dev_container_size_.height, dev_container_size_.pitch);
+
+      std::string filename =
+      "-" + std::to_string(dev_container_size_.width) +
+      "-" + std::to_string(dev_container_size_.height) +
+      "-" + std::to_string(dev_container_size_.depth) + ".raw";
+
+
+      frame_0.WriteRAWToFileF32(std::string("./data/output/test1_smooth" + filename).c_str());
+
+      frame_1.WriteRAWToFileF32(std::string("./data/output/test2_smooth" + filename).c_str());
+
+  }
+
 
   /* Main loop */
   while (current_warp_level >= 0) {
@@ -391,34 +442,34 @@ void OpticalFlowE::ComputeFlow(Data3D& frame_0, Data3D& frame_1, Data3D& flow_u,
 
     /* Flow field median filtering */
     {
-      CUdeviceptr dev_temp = cuda_memory_ptrs_.top();
-      cuda_memory_ptrs_.pop();
+      //CUdeviceptr dev_temp = cuda_memory_ptrs_.top();
+      //cuda_memory_ptrs_.pop();
 
-      op.Clear();
-      op.PushValuePtr("dev_input",  &dev_flow_u);
-      op.PushValuePtr("dev_output", &dev_temp);
-      op.PushValuePtr("data_size",  &current_data_size);
-      op.PushValuePtr("radius",     &median_radius);
-      cuop_median_.Execute(op);
-      std::swap(dev_flow_u, dev_temp);
+      //op.Clear();
+      //op.PushValuePtr("dev_input",  &dev_flow_u);
+      //op.PushValuePtr("dev_output", &dev_temp);
+      //op.PushValuePtr("data_size",  &current_data_size);
+      //op.PushValuePtr("radius",     &median_radius);
+      //cuop_median_.Execute(op);
+      //std::swap(dev_flow_u, dev_temp);
 
-      op.Clear();
-      op.PushValuePtr("dev_input",  &dev_flow_v);
-      op.PushValuePtr("dev_output", &dev_temp);
-      op.PushValuePtr("data_size",  &current_data_size);
-      op.PushValuePtr("radius",     &median_radius);
-      cuop_median_.Execute(op);
-      std::swap(dev_flow_v, dev_temp);
+      //op.Clear();
+      //op.PushValuePtr("dev_input",  &dev_flow_v);
+      //op.PushValuePtr("dev_output", &dev_temp);
+      //op.PushValuePtr("data_size",  &current_data_size);
+      //op.PushValuePtr("radius",     &median_radius);
+      //cuop_median_.Execute(op);
+      //std::swap(dev_flow_v, dev_temp);
 
-      op.Clear();
-      op.PushValuePtr("dev_input",  &dev_flow_w);
-      op.PushValuePtr("dev_output", &dev_temp);
-      op.PushValuePtr("data_size",  &current_data_size);
-      op.PushValuePtr("radius",     &median_radius);
-      cuop_median_.Execute(op);
-      std::swap(dev_flow_w, dev_temp);
+      //op.Clear();
+      //op.PushValuePtr("dev_input",  &dev_flow_w);
+      //op.PushValuePtr("dev_output", &dev_temp);
+      //op.PushValuePtr("data_size",  &current_data_size);
+      //op.PushValuePtr("radius",     &median_radius);
+      //cuop_median_.Execute(op);
+      //std::swap(dev_flow_w, dev_temp);
 
-      cuda_memory_ptrs_.push(dev_temp);
+      //cuda_memory_ptrs_.push(dev_temp);
     }
 
 #ifndef NO_VISUALIZATION

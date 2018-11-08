@@ -24,6 +24,7 @@
 
 #include "src/cuda_operations/cuda_operation_base.h"
 #include "src/cuda_operations/entire_data/cuda_operation_add.h"
+#include "src/cuda_operations/entire_data/cuda_operation_convolution.h"
 #include "src/cuda_operations/entire_data/cuda_operation_median.h"
 #include "src/cuda_operations/entire_data/cuda_operation_registration.h"
 #include "src/cuda_operations/entire_data/cuda_operation_resample.h"
@@ -44,6 +45,7 @@ private:
 
   CudaOperationAdd cuop_add_;
   CudaOperationMedian cuop_median_;
+  CudaOperationConvolution3D cuop_convolution_;
   CudaOperationRegistration cuop_register_;
   CudaOperationResample cuop_resample_;
   CudaOperationSolve cuop_solve_;
