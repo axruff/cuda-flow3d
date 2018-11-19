@@ -168,16 +168,17 @@ void CudaOperationConvolution3D::Execute(OperationParameters& params)
     int pitch = static_cast<int>(dev_container_size_.pitch / sizeof(float));
 
     /* 1. Process in horizontal direction (rows) */
-    //ResampleRows(dev_input, dev_temp, data_size, pitch);
+    ResampleRows(dev_input, dev_output, data_size, pitch);
     //ResampleRows(dev_input, dev_output, data_size, pitch);
 
 
     /* 2. Process in vertical direction (columns) */
-    //ResampleColumns(dev_temp, dev_output, data_size, pitch);
-    ResampleColumns(dev_input, dev_output, data_size, pitch);
+    ResampleColumns(dev_output, dev_temp, data_size, pitch);
+    //ResampleColumns(dev_input, dev_output, data_size, pitch);
 
     /* 3. Process in depth direction (slices) */
-    //ResampleSlices(dev_temp, dev_output, data_size, pitch);
+    ResampleSlices(dev_temp, dev_output, data_size, pitch);
+    //ResampleSlices(dev_input, dev_output, data_size, pitch);
 
 
 }
@@ -280,6 +281,59 @@ void CudaOperationConvolution3D::ResampleColumns(CUdeviceptr input, CUdeviceptr 
         &kernel_radius };
 
     CheckCudaError(cuLaunchKernel(cuf_convolution_cols_,
+        col_grid_dim.x, col_grid_dim.y, col_grid_dim.z,
+        col_block_dim.x, col_block_dim.y, col_block_dim.z,
+        needed_shared_memory_size,
+        NULL,
+        args,
+        NULL));
+}
+
+void CudaOperationConvolution3D::ResampleSlices(CUdeviceptr input, CUdeviceptr output, DataSize4& data_size, size_t pitch) const
+{
+    int kernel_radius = static_cast<int>(kernel_radius_);
+
+    unsigned int slices_results_steps = 4;
+    unsigned int slices_halo_steps = 1;
+
+    dim3 col_block_dim ={ 4, 4, 16 };
+    dim3 col_grid_dim ={ static_cast<unsigned int>((data_size.width  + col_block_dim.x - 1) / col_block_dim.x),
+        static_cast<unsigned int>((data_size.height  + col_block_dim.y - 1) / col_block_dim.y), 
+        static_cast<unsigned int>((data_size.depth + (col_block_dim.z * slices_results_steps) - 1) / (col_block_dim.z * slices_results_steps)) };
+
+    int shared_memory_size;
+    CUdevice cu_device;
+    CheckCudaError(cuDeviceGet(&cu_device, 0));
+    CheckCudaError(cuDeviceGetAttribute(&shared_memory_size, CU_DEVICE_ATTRIBUTE_SHARED_MEMORY_PER_BLOCK, cu_device));
+
+    int needed_shared_memory_size =
+        (col_block_dim.x * col_block_dim.y * ((slices_results_steps + 2*slices_halo_steps)*col_block_dim.z + 0)) * sizeof(float);
+
+    //std::printf("Shared memory: %d Needed: %d \n", shared_memory_size, needed_shared_memory_size);
+
+    if (needed_shared_memory_size > shared_memory_size) {
+        std::printf("<%s>: Error shared memory allocation. Reduce the thread block size.\n", GetName());
+        std::printf("Shared memory: %d Needed: %d \n", shared_memory_size, needed_shared_memory_size);
+        return;
+    }
+
+    /* std::printf("Starting Convolution kernel: Grid: %d x %d, Blocks %d x %d \n", col_grid_dim.x,
+    col_grid_dim.y,
+    col_block_dim.x,
+    col_block_dim.y);
+    */
+
+
+    void* args[7] ={
+        &output,
+        &input,
+        &data_size.width,
+        &data_size.height,
+        &data_size.depth,
+        &pitch,
+        &kernel_radius };
+
+    CheckCudaError(cuLaunchKernel(cuf_convolution_slices_,
         col_grid_dim.x, col_grid_dim.y, col_grid_dim.z,
         col_block_dim.x, col_block_dim.y, col_block_dim.z,
         needed_shared_memory_size,

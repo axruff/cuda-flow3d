@@ -111,6 +111,7 @@ extern "C" __global__ void convolutionRowsKernel(
         // Modified version to allow for arbitrary image width
         size_t global_x = blockIdx.x * ROWS_RESULT_STEPS * ROWS_BLOCKDIM_X + ROWS_BLOCKDIM_X*(i-ROWS_HALO_STEPS) + threadIdx.x;
         s_Data[threadIdx.z][threadIdx.y][threadIdx.x + i * ROWS_BLOCKDIM_X] = (global_x < imageW) ? d_Src[i * ROWS_BLOCKDIM_X] : 0;
+
     }
 
     //Load left halo
@@ -192,7 +193,7 @@ extern "C" __global__ void convolutionColumnsKernel(
     int kernel_radius
 )
 {
-    __shared__ float s_Data[COLUMNS_BLOCKDIM_X][(COLUMNS_RESULT_STEPS + 2 * COLUMNS_HALO_STEPS) * COLUMNS_BLOCKDIM_Y + 0][COLUMNS_BLOCKDIM_Z];
+    __shared__ float s_Data[COLUMNS_BLOCKDIM_X][(COLUMNS_RESULT_STEPS + 2 * COLUMNS_HALO_STEPS) * COLUMNS_BLOCKDIM_Y][COLUMNS_BLOCKDIM_Z];
 
     //Offset to the upper halo edge
     const int baseX = blockIdx.x * COLUMNS_BLOCKDIM_X + threadIdx.x;
@@ -290,6 +291,84 @@ extern "C" __global__ void convolutionSlicesKernel(
     int kernel_radius
     )
 {
+
+    __shared__ float s_Data[SLICES_BLOCKDIM_X][SLICES_BLOCKDIM_Y][(SLICES_RESULT_STEPS + 2 * SLICES_HALO_STEPS) * SLICES_BLOCKDIM_Z];
+
+    //Offset to the upper halo edge
+    const int baseX = blockIdx.x * SLICES_BLOCKDIM_X + threadIdx.x;
+    const int baseY = blockIdx.y * SLICES_BLOCKDIM_Y + threadIdx.y;
+    const int baseZ = (blockIdx.z * SLICES_RESULT_STEPS - SLICES_HALO_STEPS) * SLICES_BLOCKDIM_Z + threadIdx.z;
+
+
+    d_Src += (baseZ*imageH + baseY) * pitch + baseX;
+    d_Dst += (baseZ*imageH + baseY) * pitch + baseX;
+
+
+    //Main data
+#pragma unroll
+
+    for (int i = SLICES_HALO_STEPS; i < SLICES_HALO_STEPS + SLICES_RESULT_STEPS; i++)
+    {
+        // Original NVIDIA version
+        //s_Data[threadIdx.x][threadIdx.y + i * COLUMNS_BLOCKDIM_Y] = d_Src[i * COLUMNS_BLOCKDIM_Y * pitch];
+
+        // Modified version to allow for arbitrary image height
+        size_t global_z = blockIdx.z * SLICES_RESULT_STEPS * SLICES_BLOCKDIM_Z + SLICES_BLOCKDIM_Z*(i-SLICES_HALO_STEPS) + threadIdx.z;
+        s_Data[threadIdx.x][threadIdx.y][threadIdx.z + i * SLICES_BLOCKDIM_Z]= (global_z < imageD) ? d_Src[i * SLICES_BLOCKDIM_Z * pitch*imageH] : 0;
+
+    }
+
+    //Front halo
+#pragma unroll
+
+    for (int i = 0; i < SLICES_HALO_STEPS; i++)
+    {
+        s_Data[threadIdx.x][threadIdx.y][threadIdx.z + i * SLICES_BLOCKDIM_Z] = (baseZ >= -i * SLICES_BLOCKDIM_Z) ? d_Src[i * SLICES_BLOCKDIM_Z * pitch*imageH] : 0;
+    }
+
+    //Back halo
+#pragma unroll
+
+    for (int i = SLICES_HALO_STEPS + SLICES_RESULT_STEPS; i < SLICES_HALO_STEPS + SLICES_RESULT_STEPS + SLICES_HALO_STEPS; i++)
+    {
+        s_Data[threadIdx.x][threadIdx.y][threadIdx.z + i * SLICES_BLOCKDIM_Z] = (imageD - baseZ > i * SLICES_BLOCKDIM_Z) ? d_Src[i * SLICES_BLOCKDIM_Z * pitch*imageH] : 0;
+
+
+    }
+
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< //
+    // -------------------------------------------------------- //
+    __syncthreads();
+    // -------------------------------------------------------- //
+    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< //
+
+#pragma unroll
+
+    for (int i = SLICES_HALO_STEPS; i < SLICES_HALO_STEPS + SLICES_RESULT_STEPS; i++)
+    {
+
+        size_t global_z = blockIdx.z * SLICES_RESULT_STEPS * SLICES_BLOCKDIM_Z + SLICES_BLOCKDIM_Z*(i-SLICES_HALO_STEPS) + threadIdx.z;
+
+        //std::printf("By:%u ty:%u iter:%d global.y: %lu\n", blockIdx.y, threadIdx.y, i, static_cast<unsigned long>(global_y));
+
+        if (global_z >= imageD)
+            return;
+
+        float sum = 0;
+#pragma unroll
+
+
+
+        for (int j = -kernel_radius; j <= kernel_radius; j++)
+        {
+            sum += c_Kernel[kernel_radius - j] * s_Data[threadIdx.x][threadIdx.y][threadIdx.z + i * SLICES_BLOCKDIM_Z + j];
+        }
+
+        d_Dst[i * SLICES_BLOCKDIM_Z * pitch*imageH] = sum;
+
+        //std::printf("out: %d \n", i * COLUMNS_BLOCKDIM_Y * pitch);
+    }
+
 }
 
 

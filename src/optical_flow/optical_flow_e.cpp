@@ -241,18 +241,17 @@ void OpticalFlowE::ComputeFlow(Data3D& frame_0, Data3D& frame_1, Data3D& flow_u,
 
 
       // Test: Save smoothed image
-      CopyData3DFromDevice(dev_frame_0, frame_0, dev_container_size_.height, dev_container_size_.pitch);
-      CopyData3DFromDevice(dev_frame_1, frame_1, dev_container_size_.height, dev_container_size_.pitch);
+      //CopyData3DFromDevice(dev_frame_0, frame_0, dev_container_size_.height, dev_container_size_.pitch);
+      //CopyData3DFromDevice(dev_frame_1, frame_1, dev_container_size_.height, dev_container_size_.pitch);
 
-      std::string filename =
-      "-" + std::to_string(dev_container_size_.width) +
-      "-" + std::to_string(dev_container_size_.height) +
-      "-" + std::to_string(dev_container_size_.depth) + ".raw";
+      //std::string filename =
+      //"-" + std::to_string(dev_container_size_.width) +
+      //"-" + std::to_string(dev_container_size_.height) +
+      //"-" + std::to_string(dev_container_size_.depth) + ".raw";
 
 
-      frame_0.WriteRAWToFileF32(std::string("./data/output/test1_smooth" + filename).c_str());
-
-      frame_1.WriteRAWToFileF32(std::string("./data/output/test2_smooth" + filename).c_str());
+      //frame_0.WriteRAWToFileF32(std::string("./data/output/test1_smooth" + filename).c_str());
+      //frame_1.WriteRAWToFileF32(std::string("./data/output/test2_smooth" + filename).c_str());
 
   }
 
