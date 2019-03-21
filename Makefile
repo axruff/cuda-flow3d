@@ -3,23 +3,25 @@ INC-DIR := "-I$(BASEDIR)"
 
 CC := g++
 CFLAGS := -c -std=c++11 -O3 -funroll-all-loops  -Wno-deprecated -D NO_VISUALIZATION
-TARGET := cuda-flow3d
-
-CUDA-TOP     = /home/ws/fe0968/local/cuda-8.0
-#CUDA-TOP     = /usr/local/cuda-7.0 
-
-#CUDA         = $(CUDA-TOP)/bin/nvcc 
-#CUDA-INC-DIR = -I$(CUDA-TOP)/include 
-#CUDA-LIB-DIR = -L$(CUDA-TOP)/lib64 -lcudart -lcuda  
-
-# ankaimage-concert
-CUDA         = /usr/bin/nvcc 
-CUDA-INC-DIR = -I/usr/include
-CUDA-LIB-DIR = -L/usr/lib/x86_64-linux-gnu -lcudart -lcuda   # ESRF lbs191 GPU machine
-
 CUDA-FLAGS   = -ptx -std=c++11
 
+MACHINE := concert
 
+
+ifeq ($(MACHINE),rtx)
+  # anka-rtx
+  TARGET := cuda-flow3d-rtx
+  CUDA-TOP     = /home/ws/fe0968/local/cuda-10.0
+  CUDA         = $(CUDA-TOP)/bin/nvcc 
+  CUDA-INC-DIR = -I$(CUDA-TOP)/include 
+  CUDA-LIB-DIR = -L$(CUDA-TOP)/lib64 -lcudart -lcuda  
+else
+  # ankaimage-concert
+  TARGET := cuda-flow3d-concert
+  CUDA         = /usr/bin/nvcc 
+  CUDA-INC-DIR = -I/usr/include
+  CUDA-LIB-DIR = -L/usr/lib/x86_64-linux-gnu -lcudart -lcuda 
+endif
 
 
 SRCS := $(wildcard $(BASEDIR)/src/*.cpp \
