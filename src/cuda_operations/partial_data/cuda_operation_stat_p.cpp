@@ -18,6 +18,7 @@
 
 #include <cstring>
 #include <algorithm>
+#include <cmath>
 
 #include "src/data_types/data3d.h"
 #include "src/data_types/data_structs.h"

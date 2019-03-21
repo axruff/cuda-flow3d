@@ -5,7 +5,8 @@ CC := g++
 CFLAGS := -c -std=c++11 -O3 -funroll-all-loops  -Wno-deprecated -D NO_VISUALIZATION
 TARGET := cuda-flow3d
 
-CUDA-TOP     = /usr/local/cuda-7.0
+CUDA-TOP     = /home/ws/fe0968/local/cuda-10.0         
+#CUDA-TOP     = /usr/local/cuda-7.0                    
 CUDA         = $(CUDA-TOP)/bin/nvcc 
 #CUDA         = $/usr/bin/nvcc                          # ESRF lbs191 GPU machine
 
