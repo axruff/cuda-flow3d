@@ -36,21 +36,25 @@
 
 int main(int argc, char** argv)
 {
-  const bool key_press = false;
+  const bool key_press = true;
   const bool use_visualization = false;
-  const bool silent_mode = true;
+  const bool silent_mode = false;
 
   const bool use_entire_gpu = true;
   const bool use_partial_gpu = false;
 
   /* Dataset variables */
-  const size_t width = 128;
-  const size_t height = 128;
-  const size_t depth = 128;
+  //const size_t width = 128;
+  //const size_t height = 128;
+  //const size_t depth = 128;
 
   //const size_t width = 584;
   //const size_t height = 388;
   //const size_t depth = 5;
+
+  const size_t width = 700;
+  const size_t height = 600;
+  const size_t depth = 500;
 
   /* Optical flow variables */
   size_t  warp_levels_count       = 20;
@@ -61,7 +65,7 @@ int main(int argc, char** argv)
   float   equation_smoothness     = 0.001f;
   float   equation_data           = 0.001f;
   size_t  median_radius           = 3;
-  float   gaussian_sigma          = 0.46f;
+  float   gaussian_sigma          = 1.5f;
 
   OpticalFlowE optical_flow_e;
   OpticalFlowP optical_flow_p;
@@ -83,15 +87,20 @@ int main(int argc, char** argv)
     return 1;
   }
   /* Load input data */
-  if (!frame_0.ReadRAWFromFileU8("./data/frame_0_128-128-128.raw", data_size.width, data_size.height, data_size.depth) ||
-      !frame_1.ReadRAWFromFileU8("./data/frame_1_128-128-128.raw", data_size.width, data_size.height, data_size.depth)) {
-    return 2;
-  }
+  //if (!frame_0.ReadRAWFromFileU8("./data/frame_0_128-128-128.raw", data_size.width, data_size.height, data_size.depth) ||
+  //    !frame_1.ReadRAWFromFileU8("./data/frame_1_128-128-128.raw", data_size.width, data_size.height, data_size.depth)) {
+  //  return 2;
+  //}
 
   //if (!frame_0.ReadRAWFromFileU8("./data/rub1-584-388-5.raw", data_size.width, data_size.height, data_size.depth) ||
   //    !frame_1.ReadRAWFromFileU8("./data/rub2-584-388-5.raw", data_size.width, data_size.height, data_size.depth)) {
   //    return 2;
   //}
+
+  if (!frame_0.ReadRAWFromFileU8("./data/syn13_vol_700_600_500_07.raw", data_size.width, data_size.height, data_size.depth) ||
+      !frame_1.ReadRAWFromFileU8("./data/syn13_vol_700_600_500_08.raw", data_size.width, data_size.height, data_size.depth)) {
+      return 2;
+  }
 
 #ifndef NO_VISUALIZATION
   Visualization& visualization = Visualization::GetInstance();
