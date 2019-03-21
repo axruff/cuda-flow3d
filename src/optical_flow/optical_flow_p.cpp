@@ -17,6 +17,7 @@
 #include "src/optical_flow/optical_flow_p.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 
 #include "src/utils/common_utils.h"
