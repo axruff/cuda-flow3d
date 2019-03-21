@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cmath>
 #include <string>
 
 #include "src/utils/common_utils.h"
@@ -441,34 +442,34 @@ void OpticalFlowE::ComputeFlow(Data3D& frame_0, Data3D& frame_1, Data3D& flow_u,
 
     /* Flow field median filtering */
     {
-      //CUdeviceptr dev_temp = cuda_memory_ptrs_.top();
-      //cuda_memory_ptrs_.pop();
+      CUdeviceptr dev_temp = cuda_memory_ptrs_.top();
+      cuda_memory_ptrs_.pop();
 
-      //op.Clear();
-      //op.PushValuePtr("dev_input",  &dev_flow_u);
-      //op.PushValuePtr("dev_output", &dev_temp);
-      //op.PushValuePtr("data_size",  &current_data_size);
-      //op.PushValuePtr("radius",     &median_radius);
-      //cuop_median_.Execute(op);
-      //std::swap(dev_flow_u, dev_temp);
+      op.Clear();
+      op.PushValuePtr("dev_input",  &dev_flow_u);
+      op.PushValuePtr("dev_output", &dev_temp);
+      op.PushValuePtr("data_size",  &current_data_size);
+      op.PushValuePtr("radius",     &median_radius);
+      cuop_median_.Execute(op);
+      std::swap(dev_flow_u, dev_temp);
 
-      //op.Clear();
-      //op.PushValuePtr("dev_input",  &dev_flow_v);
-      //op.PushValuePtr("dev_output", &dev_temp);
-      //op.PushValuePtr("data_size",  &current_data_size);
-      //op.PushValuePtr("radius",     &median_radius);
-      //cuop_median_.Execute(op);
-      //std::swap(dev_flow_v, dev_temp);
+      op.Clear();
+      op.PushValuePtr("dev_input",  &dev_flow_v);
+      op.PushValuePtr("dev_output", &dev_temp);
+      op.PushValuePtr("data_size",  &current_data_size);
+      op.PushValuePtr("radius",     &median_radius);
+      cuop_median_.Execute(op);
+      std::swap(dev_flow_v, dev_temp);
 
-      //op.Clear();
-      //op.PushValuePtr("dev_input",  &dev_flow_w);
-      //op.PushValuePtr("dev_output", &dev_temp);
-      //op.PushValuePtr("data_size",  &current_data_size);
-      //op.PushValuePtr("radius",     &median_radius);
-      //cuop_median_.Execute(op);
-      //std::swap(dev_flow_w, dev_temp);
+      op.Clear();
+      op.PushValuePtr("dev_input",  &dev_flow_w);
+      op.PushValuePtr("dev_output", &dev_temp);
+      op.PushValuePtr("data_size",  &current_data_size);
+      op.PushValuePtr("radius",     &median_radius);
+      cuop_median_.Execute(op);
+      std::swap(dev_flow_w, dev_temp);
 
-      //cuda_memory_ptrs_.push(dev_temp);
+      cuda_memory_ptrs_.push(dev_temp);
     }
 
 #ifndef NO_VISUALIZATION
