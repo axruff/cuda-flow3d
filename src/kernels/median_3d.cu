@@ -29,20 +29,21 @@
 __constant__ DataSize4 container_size;
 
 
-extern __shared__ float shared[];\
+extern __shared__ float shared[];
 
-__device__ void sort(float* buffer, size_t length)
+__device__ void insertionSort(float* window, size_t size)
 {
-  for (int i = 0; i < length - 1; i++) {
-    for (int k = 0; k < length - i - 1; k++) {
-      if (buffer[k] > buffer[k + 1]) {
-        float a = buffer[k];
-        buffer[k] = buffer[k + 1];
-        buffer[k + 1] = a;
-      }
+    int i, j;
+    float temp;
+    for (i = 0; i < size; i++) {
+        temp = window[i];
+        for (j = i-1; j >= 0 && temp < window[j]; j--) {
+            window[j+1] = window[j];
+        }
+        window[j+1] = temp;
     }
-  }
 }
+
 
 /* See a note about the thread block size in cuda_operation_median.cpp file.*/
 extern "C" __global__ void median_3d(
@@ -291,7 +292,7 @@ extern "C" __global__ void median_3d(
     }
 
     size_t length = radius * radius * radius;
-    sort(buffer, length);
+    insertionSort(buffer, length);
 
     output[IND(global_id.x, global_id.y, global_id.z)] = buffer[length / 2];
   }

@@ -22,6 +22,7 @@
 
 #include "src/cuda_operations/cuda_operation_base.h"
 #include "src/cuda_operations/partial_data/cuda_operation_add_p.h"
+#include "src/cuda_operations/entire_data/cuda_operation_median.h"
 #include "src/cuda_operations/partial_data/cuda_operation_register_p.h"
 #include "src/cuda_operations/partial_data/cuda_operation_resample_p.h"
 #include "src/cuda_operations/partial_data/cuda_operation_solve_p.h"
@@ -39,6 +40,7 @@ private:
 
   CudaOperationRegistrationP cuop_register_p_;
   CudaOperationResampleP cuop_resample_p_;
+  CudaOperationMedian cuop_median_;
   CudaOperationSolveP cuop_solve_p_;
   CudaOperationStatP cuop_stat_p_;
   CudaOperationAddP cuop_add_p_;

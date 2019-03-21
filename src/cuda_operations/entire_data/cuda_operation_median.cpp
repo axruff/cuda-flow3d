@@ -107,7 +107,7 @@ void CudaOperationMedian::Execute(OperationParameters& params)
     /* Be careful with the thread block size. Thread block size in each dimension
        should be greater than radius / 2, because radius / 2 threads are used to 
        load halo around the thread block. */
-    dim3 block_dim = { 8, 8, 8 };
+    dim3 block_dim = { 16, 8, 4 };
 
     /* Calculate the needed shared memory size */
     int shared_memory_size;
