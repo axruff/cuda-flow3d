@@ -5,7 +5,7 @@ CC := g++
 CFLAGS := -c -std=c++11 -O3 -funroll-all-loops  -Wno-deprecated -D NO_VISUALIZATION
 CUDA-FLAGS   = -ptx -std=c++11
 
-MACHINE := concert
+MACHINE := rtx
 
 
 ifeq ($(MACHINE),rtx)
@@ -24,9 +24,13 @@ else
 endif
 
 
-SRCS := $(wildcard $(BASEDIR)/src/*.cpp \
+SRCS := $(filter-out $(BASEDIR)/src/visualization.cpp, $(wildcard $(BASEDIR)/src/*.cpp \
 			$(BASEDIR)/src/*/*/*.cpp \
-			$(BASEDIR)/src/*/*.cpp)
+			$(BASEDIR)/src/*/*.cpp))
+
+
+
+#SRCS = $(filter-out src/visualization.cpp src/visualization.h, $(SRCS))
 
 OBJS := $(patsubst %.cpp,%.o,$(SRCS))
 
