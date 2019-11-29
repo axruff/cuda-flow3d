@@ -18,6 +18,9 @@
 #include <cstring>
 #include <ctime>
 #include <string>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 #include <cuda.h>
 
@@ -34,9 +37,23 @@
 #endif
 
 
+using namespace std;
+
+std::string ZeroPadNumber(int num, int pad_num)
+{
+    std::ostringstream ss;
+
+    ss.fill('0');
+
+    ss << setw(pad_num) << num;
+    return ss.str(); 
+}
+
+
 int main(int argc, char** argv)
 {
-  const bool key_press = true;
+
+  const bool key_press = false;
   const bool use_visualization = false;
   const bool silent_mode = false;
 
@@ -52,20 +69,20 @@ int main(int argc, char** argv)
   //const size_t height = 388;
   //const size_t depth = 5;
 
-  const size_t width = 700;
-  const size_t height = 600;
-  const size_t depth = 500;
+  const size_t width = 450;
+  const size_t height = 180;
+  const size_t depth = 450;
 
   /* Optical flow variables */
-  size_t  warp_levels_count       = 20;
-  float   warp_scale_factor       = 0.9f;
-  size_t  outer_iterations_count  = 20;
+  size_t  warp_levels_count       = 40;
+  float   warp_scale_factor       = 0.95f;
+  size_t  outer_iterations_count  = 40;
   size_t  inner_iterations_count  = 5;
-  float   equation_alpha          = 3.5f;
+  float   equation_alpha          = 7.5f;
   float   equation_smoothness     = 0.001f;
   float   equation_data           = 0.001f;
-  size_t  median_radius           = 3;
-  float   gaussian_sigma          = 1.5f;
+  size_t  median_radius           = 5;
+  float   gaussian_sigma          = 2.0f;
 
   OpticalFlowE optical_flow_e;
   OpticalFlowP optical_flow_p;
@@ -76,11 +93,26 @@ int main(int argc, char** argv)
   DataSize4 data_size = {width, height, depth, 0};
 
   std::printf("//----------------------------------------------------------------------//\n");
-  std::printf("//            3D Optical flow using NVIDIA CUDA. Version 0.6.0	        //\n");
+  std::printf("//            3D Optical flow using NVIDIA CUDA. Version 0.6.0	         //\n");
   std::printf("//                                                                      //\n");
   std::printf("//            Karlsruhe Institute of Technology. 2015 - 2018            //\n");
   std::printf("//----------------------------------------------------------------------//\n");
 
+  int pd = 3;
+  int start = 0;
+  int end = 0;
+
+  //string path = "./data/"; 
+  std::string path = "/mnt/LSDF/tomo/ershov/cork/2019-11-InSitu-MotionAnalysis/Spray_61a/";
+  
+  std::string file_name = "_scaled2_450-450-180.raw";
+  
+  
+  if (argc > 2)  {
+        start = atoi(argv[1]);
+        end = atoi(argv[2]);
+  }
+        
 
   /* Initialize CUDA */
   if (!InitCudaContextWithFirstAvailableDevice(&cu_context)) {
@@ -96,9 +128,12 @@ int main(int argc, char** argv)
   //    !frame_1.ReadRAWFromFileU8("./data/rub2-584-388-5.raw", data_size.width, data_size.height, data_size.depth)) {
   //    return 2;
   //}
+  
+for (int i=start; i<end; i++) {
 
-  if (!frame_0.ReadRAWFromFileU8("./data/syn13_vol_700_600_500_07.raw", data_size.width, data_size.height, data_size.depth) ||
-      !frame_1.ReadRAWFromFileU8("./data/syn13_vol_700_600_500_08.raw", data_size.width, data_size.height, data_size.depth)) {
+
+  if (!frame_0.ReadRAWFromFileU8((path + "input/" + ZeroPadNumber(i, pd) + "_scaled2_450-450-180.raw").c_str(), data_size.width, data_size.height, data_size.depth) ||
+      !frame_1.ReadRAWFromFileU8((path + "input/" + ZeroPadNumber(i + 1, pd) + "_scaled2_450-450-180.raw").c_str(), data_size.width, data_size.height, data_size.depth)) {
       return 2;
   }
 
@@ -140,10 +175,12 @@ int main(int argc, char** argv)
       "-" + std::to_string(height) +
       "-" + std::to_string(depth) + ".raw";
 
-    flow_u.WriteRAWToFileF32(std::string("./data/output/flow-u" + filename).c_str());
-    flow_v.WriteRAWToFileF32(std::string("./data/output/flow-v" + filename).c_str());
-    flow_w.WriteRAWToFileF32(std::string("./data/output/flow-w" + filename).c_str());
-
+    flow_u.WriteRAWToFileF32(std::string(path + "output/" + ZeroPadNumber(i, pd) + "_flow-u" + filename).c_str());
+    //flow_v.WriteRAWToFileF32(std::string(path + "output/flow-v" + filename).c_str());
+    //flow_w.WriteRAWToFileF32(std::string(path + "output/flow-w" + filename).c_str());
+    flow_v.WriteRAWToFileF32(std::string(path + "output/" + ZeroPadNumber(i, pd) + "_flow-v" + filename).c_str());
+    flow_w.WriteRAWToFileF32(std::string(path + "output/" + ZeroPadNumber(i, pd) + "_flow-w" + filename).c_str());
+    
     optical_flow_e.Destroy();
   }
 
@@ -186,6 +223,9 @@ int main(int argc, char** argv)
     visualization.WaitForFinalization();
   }
 #endif
+
+
+}
 
   if (key_press) {
     std::printf("Press enter to continue...");
